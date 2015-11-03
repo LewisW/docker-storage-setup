@@ -118,12 +118,12 @@ get_devicemapper_config_options() {
     fi
     done )
 
-    storage_options="DOCKER_OPTS=--storage-driver devicemapper --storage-opt dm.fs=xfs --storage-opt dm.thinpooldev=$POOL_DEVICE_PATH $(get_deferred_removal_string) $(get_deferred_deletion_string)"
+    storage_options="DOCKER_OPTS='--storage-driver devicemapper --storage-opt dm.fs=xfs --storage-opt dm.thinpooldev=$POOL_DEVICE_PATH $(get_deferred_removal_string) $(get_deferred_deletion_string)'"
   echo $storage_options
 }
 
 get_overlay_config_options() {
-  echo "DOCKER_OPTS=--storage-driver overlay"
+  echo "DOCKER_OPTS='--storage-driver overlay'"
 }
 
 write_storage_config_file () {
