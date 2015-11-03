@@ -57,7 +57,7 @@ POOL_LV_NAME="docker-pool"
 DATA_LV_NAME=$POOL_LV_NAME
 META_LV_NAME="${POOL_LV_NAME}meta"
 
-DOCKER_STORAGE="/etc/sysconfig/docker-storage"
+DOCKER_STORAGE="/etc/default/docker"
 STORAGE_DRIVERS="devicemapper overlay"
 
 get_docker_version() {
@@ -118,12 +118,12 @@ get_devicemapper_config_options() {
     fi
     done )
 
-    storage_options="DOCKER_STORAGE_OPTIONS=--storage-driver devicemapper --storage-opt dm.fs=xfs --storage-opt dm.thinpooldev=$POOL_DEVICE_PATH $(get_deferred_removal_string) $(get_deferred_deletion_string)"
+    storage_options="DOCKER_OPTS=--storage-driver devicemapper --storage-opt dm.fs=xfs --storage-opt dm.thinpooldev=$POOL_DEVICE_PATH $(get_deferred_removal_string) $(get_deferred_deletion_string)"
   echo $storage_options
 }
 
 get_overlay_config_options() {
-  echo "DOCKER_STORAGE_OPTIONS=--storage-driver overlay"
+  echo "DOCKER_OPTS=--storage-driver overlay"
 }
 
 write_storage_config_file () {
@@ -355,7 +355,7 @@ is_old_data_meta_mode() {
     return 1
   fi
 
-  if ! grep -e "^DOCKER_STORAGE_OPTIONS=.*dm\.datadev" -e "^DOCKER_STORAGE_OPTIONS=.*dm\.metadatadev" $DOCKER_STORAGE  > /dev/null 2>&1;then
+  if ! grep -e "^DOCKER_OPTS=.*dm\.datadev" -e "^DOCKER_OPTS=.*dm\.metadatadev" $DOCKER_STORAGE  > /dev/null 2>&1;then
     return 1
   fi
 
@@ -480,10 +480,10 @@ disable_auto_pool_extension() {
 }
 
 
-# Gets the current DOCKER_STORAGE_OPTIONS= string.
+# Gets the current DOCKER_OPTS= string.
 get_docker_storage_options() {
   local options
-  if options=$(grep -e "^DOCKER_STORAGE_OPTIONS=" $DOCKER_STORAGE | sed 's/DOCKER_STORAGE_OPTIONS=//' | sed 's/^ *//');then
+  if options=$(grep -e "^DOCKER_OPTS=" $DOCKER_STORAGE | sed 's/DOCKER_OPTS=//' | sed 's/^ *//');then
     echo $options
     return 0
   fi
@@ -513,7 +513,7 @@ get_existing_storage_driver() {
     return 1
   fi
 
-  # DOCKER_STORAGE_OPTIONS= is empty there is no storage driver configured yet.
+  # DOCKER_OPTS= is empty there is no storage driver configured yet.
   [ -z "$options" ] && return 0
 
   # Check if -storage-driver <driver> is there.
